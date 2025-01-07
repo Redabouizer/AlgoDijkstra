@@ -1,10 +1,10 @@
-import React from 'react'
+import React from 'react';
 
 function ColorPicker({ selectedColor, setSelectedColor }) {
-  const colors = ['#000000', '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#FFFFFF']
+  const colors = ['#000000', '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#FFFFFF'];
 
   return (
-    <div className="color-picker fixed bottom-20 right-4 bg-white bg-opacity-80 backdrop-filter backdrop-blur-lg rounded-lg shadow-lg p-2 flex flex-wrap justify-center max-w-xs">
+    <div className="color-picker fixed bottom-24 right-4 bg-white bg-opacity-80 backdrop-filter backdrop-blur-lg rounded-lg shadow-lg p-2 flex flex-wrap justify-center" style={{ zIndex: 1000 }}>
       {colors.map((color) => (
         <button
           key={color}
@@ -17,8 +17,7 @@ function ColorPicker({ selectedColor, setSelectedColor }) {
         />
       ))}
     </div>
-  )
+  );
 }
 
-export default ColorPicker
-
+export default ColorPicker;

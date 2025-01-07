@@ -1,11 +1,12 @@
-import { Square, Circle, Diamond } from 'lucide-react'
+import React from 'react';
+import { Square, Circle, Diamond } from 'lucide-react';
 
 function ShapeMenu({ onSelect }) {
   const shapes = [
     { id: 'rectangle', icon: Square, label: 'Rectangle' },
     { id: 'ellipse', icon: Circle, label: 'Ellipse' },
     { id: 'diamond', icon: Diamond, label: 'Diamond' },
-  ]
+  ];
 
   return (
     <div className="shape-menu fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-white bg-opacity-80 backdrop-filter backdrop-blur-lg rounded-lg shadow-lg p-4 flex justify-center">
@@ -20,8 +21,8 @@ function ShapeMenu({ onSelect }) {
         </button>
       ))}
     </div>
-  )
+  );
 }
 
-export default ShapeMenu
+export default ShapeMenu;
 

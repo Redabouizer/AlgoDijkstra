@@ -1,4 +1,5 @@
-import { MousePointer, Move, ArrowUpRight, Trash2, Plus, ZoomIn, ZoomOut, Copy } from 'lucide-react'
+import React from 'react';
+import { MousePointer, Move, ArrowUpRight, Trash2, Plus, ZoomIn, ZoomOut, Copy } from 'lucide-react';
 
 function Toolbar({ selectedTool, onToolSelect, onZoomIn, onZoomOut, onCopy, onDelete, className }) {
   const tools = [
@@ -10,7 +11,7 @@ function Toolbar({ selectedTool, onToolSelect, onZoomIn, onZoomOut, onCopy, onDe
     { id: 'copy', icon: Copy, label: 'Copy', onClick: onCopy },
     { id: 'zoomIn', icon: ZoomIn, label: 'Zoom In', onClick: onZoomIn },
     { id: 'zoomOut', icon: ZoomOut, label: 'Zoom Out', onClick: onZoomOut },
-  ]
+  ];
 
   return (
     <div className={`toolbar fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white rounded-full shadow-lg px-6 py-3 flex gap-4 ${className}`}>
@@ -25,8 +26,7 @@ function Toolbar({ selectedTool, onToolSelect, onZoomIn, onZoomOut, onCopy, onDe
         </button>
       ))}
     </div>
-  )
+  );
 }
 
-export default Toolbar
-
+export default Toolbar;
