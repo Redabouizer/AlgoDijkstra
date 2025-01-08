@@ -22,6 +22,10 @@ function App() {
   const [scale, setScale] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [selectionBox, setSelectionBox] = useState(null);
+  const [shortestPath, setShortestPath] = useState([]);
+  const [highlightedShape, setHighlightedShape] = useState(null);
+
+
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -50,6 +54,10 @@ function App() {
       );
       if (clickedShape) {
         setSelectedItems([clickedShape]);
+        // Set shape color to red if "chemain" is found
+        if (clickedShape.text === 'chemain') {
+          setHighlightedShape(clickedShape.id);
+        }
       } else {
         setSelectedItems([]);
       }
@@ -215,18 +223,24 @@ function App() {
     ctx.translate(pan.x, pan.y);
     ctx.scale(scale, scale);
 
+    // Render connections with highlight for the shortest path
     connections.forEach(conn => {
       const start = shapes.find(shape => shape.id === conn.start);
       const end = shapes.find(shape => shape.id === conn.end);
-      if (start && end) {
-        drawConnection(ctx, start, end, conn.label, selectedItems.includes(conn));
-      }
+
+      // Highlight only the shortest path
+      const isShortest = conn.highlighted;
+
+      drawConnection(ctx, start, end, conn.label, selectedItems.includes(conn), isShortest);
     });
 
+    // Render shapes
     shapes.forEach(shape => {
-      drawShape(ctx, shape, selectedItems.includes(shape));
+      const shapeClass = highlightedShape === shape.id ? 'border-2 border-red-500' : 'border';
+      drawShape(ctx, shape, selectedItems.includes(shape), shapeClass);
     });
 
+    // Render selection box if active
     if (selectionBox) {
       ctx.strokeStyle = 'blue';
       ctx.lineWidth = 1;
@@ -245,9 +259,80 @@ function App() {
     renderCanvas();
   }, [shapes, connections, selectedItems, selectedColor, scale, pan, selectionBox]);
 
+  const dijkstra = (startId, endId, connections) => {
+    if (startId === endId) {
+      return [startId];
+    }
+
+    const distances = {};
+    const previous = {};
+    shapes.forEach(shape => {
+      distances[shape.id] = Infinity;
+      previous[shape.id] = null;
+    });
+    distances[startId] = 0;
+
+    const unvisited = new Set(shapes.map(s => s.id));
+
+    while (unvisited.size > 0) {
+      const current = Array.from(unvisited)
+        .reduce((min, node) => distances[node] < distances[min] ? node : min);
+
+      if (current === endId) break;
+      if (distances[current] === Infinity) return [];
+
+      unvisited.delete(current);
+
+      connections
+        .filter(conn => conn.start === current || conn.end === current)
+        .forEach(conn => {
+          const next = conn.start === current ? conn.end : conn.start;
+          const weight = parseInt(conn.label) || 1;
+          const dist = distances[current] + weight;
+
+          if (dist < distances[next]) {
+            distances[next] = dist;
+            previous[next] = current;
+          }
+        });
+    }
+
+    if (!previous[endId]) return [];
+
+    const path = [];
+    let current = endId;
+    while (current) {
+      path.unshift(current);
+      current = previous[current];
+    }
+
+    // Reset all connections highlighting
+    connections.forEach(conn => {
+      conn.highlighted = false;
+    });
+
+    // Only highlight connections that are part of the shortest path
+    let minPathDistance = distances[endId];
+    for (let i = 0; i < path.length - 1; i++) {
+      const conn = connections.find(c =>
+        (c.start === path[i] && c.end === path[i + 1]) ||
+        (c.start === path[i + 1] && c.end === path[i])
+      );
+      if (conn) {
+        conn.highlighted = true;
+      }
+    }
+
+    console.log(`Shortest path distance: ${minPathDistance}`);
+    return path;
+  };
+
+
+
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-gray-100">
-      <TopBar />
+      <TopBar shapes={shapes} connections={connections} dijkstra={dijkstra} setShortestPath={setShortestPath} />
 
       <main className="flex-grow overflow-hidden relative">
         <canvas

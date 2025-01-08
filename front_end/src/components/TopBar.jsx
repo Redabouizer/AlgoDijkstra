@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-function TopBar({ onFindShortestPath }) {
+function TopBar({ shapes, connections, dijkstra, setShortestPath }) {
   const [depart, setDepart] = useState('');
   const [arrive, setArrive] = useState('');
 
@@ -9,7 +9,21 @@ function TopBar({ onFindShortestPath }) {
       alert('Please fill in both "Depart" and "Arrive" fields.');
       return;
     }
-    onFindShortestPath(depart, arrive); // Pass the data to parent for processing
+
+    // Find the start and end shapes by name
+    const startShape = shapes.find(shape => shape.text === depart);
+    const endShape = shapes.find(shape => shape.text === arrive);
+
+    if (!startShape || !endShape) {
+      alert('Invalid "Depart" or "Arrive" locations.');
+      return;
+    }
+
+    // Run Dijkstra to find the shortest path
+    const path = dijkstra(startShape.id, endShape.id, connections);
+
+    // Set the shortest path
+    setShortestPath(path);
   };
 
   return (
